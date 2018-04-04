@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hereisnaman/hacker-news-gql#readme",
   "dependencies": {
+    "dotenv": "^5.0.1",
     "graphql-yoga": "1.7.1",
     "prisma-binding": "1.5.16"
   },
