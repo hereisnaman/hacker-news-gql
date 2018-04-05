@@ -9,6 +9,17 @@ type Link implements Node {
   id: ID!
   description: String!
   url: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  postedBy(where: UserWhereInput): User
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link!]
 }
 
 
@@ -20,24 +31,18 @@ type AggregateLink {
   count: Int!
 }
 
+type AggregateUser {
+  count: Int!
+}
+
 type BatchPayload {
-  """
-  The number of nodes that have been affected by the Batch operation.
-  """
   count: Long!
 }
 
-"""
-A connection to a list of items.
-"""
+scalar DateTime
+
 type LinkConnection {
-  """
-  Information to aid in pagination.
-  """
   pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
   edges: [LinkEdge]!
   aggregate: AggregateLink!
 }
@@ -45,19 +50,21 @@ type LinkConnection {
 input LinkCreateInput {
   description: String!
   url: String!
+  postedBy: UserCreateOneWithoutLinksInput
 }
 
-"""
-An edge in a connection.
-"""
+input LinkCreateManyWithoutPostedByInput {
+  create: [LinkCreateWithoutPostedByInput!]
+  connect: [LinkWhereUniqueInput!]
+}
+
+input LinkCreateWithoutPostedByInput {
+  description: String!
+  url: String!
+}
+
 type LinkEdge {
-  """
-  The item at the end of the edge.
-  """
   node: Link!
-  """
-  A cursor for use in pagination.
-  """
   cursor: String!
 }
 
@@ -68,16 +75,18 @@ enum LinkOrderByInput {
   description_DESC
   url_ASC
   url_DESC
-  updatedAt_ASC
-  updatedAt_DESC
   createdAt_ASC
   createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type LinkPreviousValues {
   id: ID!
   description: String!
   url: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type LinkSubscriptionPayload {
@@ -88,29 +97,11 @@ type LinkSubscriptionPayload {
 }
 
 input LinkSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
   AND: [LinkSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
   OR: [LinkSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
   mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
   updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
   updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
   updatedFields_contains_some: [String!]
   node: LinkWhereInput
 }
@@ -118,195 +109,117 @@ input LinkSubscriptionWhereInput {
 input LinkUpdateInput {
   description: String
   url: String
+  postedBy: UserUpdateOneWithoutLinksInput
+}
+
+input LinkUpdateManyWithoutPostedByInput {
+  create: [LinkCreateWithoutPostedByInput!]
+  connect: [LinkWhereUniqueInput!]
+  disconnect: [LinkWhereUniqueInput!]
+  delete: [LinkWhereUniqueInput!]
+  update: [LinkUpdateWithWhereUniqueWithoutPostedByInput!]
+  upsert: [LinkUpsertWithWhereUniqueWithoutPostedByInput!]
+}
+
+input LinkUpdateWithoutPostedByDataInput {
+  description: String
+  url: String
+}
+
+input LinkUpdateWithWhereUniqueWithoutPostedByInput {
+  where: LinkWhereUniqueInput!
+  data: LinkUpdateWithoutPostedByDataInput!
+}
+
+input LinkUpsertWithWhereUniqueWithoutPostedByInput {
+  where: LinkWhereUniqueInput!
+  update: LinkUpdateWithoutPostedByDataInput!
+  create: LinkCreateWithoutPostedByInput!
 }
 
 input LinkWhereInput {
-  """
-  Logical AND on all given filters.
-  """
   AND: [LinkWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
   OR: [LinkWhereInput!]
   id: ID
-  """
-  All values that are not equal to given value.
-  """
   id_not: ID
-  """
-  All values that are contained in given list.
-  """
   id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
   id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
   id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
   id_lte: ID
-  """
-  All values greater than the given value.
-  """
   id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
   id_gte: ID
-  """
-  All values containing the given string.
-  """
   id_contains: ID
-  """
-  All values not containing the given string.
-  """
   id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
   id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
   id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
   id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
   id_not_ends_with: ID
   description: String
-  """
-  All values that are not equal to given value.
-  """
   description_not: String
-  """
-  All values that are contained in given list.
-  """
   description_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
   description_not_in: [String!]
-  """
-  All values less than the given value.
-  """
   description_lt: String
-  """
-  All values less than or equal the given value.
-  """
   description_lte: String
-  """
-  All values greater than the given value.
-  """
   description_gt: String
-  """
-  All values greater than or equal the given value.
-  """
   description_gte: String
-  """
-  All values containing the given string.
-  """
   description_contains: String
-  """
-  All values not containing the given string.
-  """
   description_not_contains: String
-  """
-  All values starting with the given string.
-  """
   description_starts_with: String
-  """
-  All values not starting with the given string.
-  """
   description_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
   description_ends_with: String
-  """
-  All values not ending with the given string.
-  """
   description_not_ends_with: String
   url: String
-  """
-  All values that are not equal to given value.
-  """
   url_not: String
-  """
-  All values that are contained in given list.
-  """
   url_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
   url_not_in: [String!]
-  """
-  All values less than the given value.
-  """
   url_lt: String
-  """
-  All values less than or equal the given value.
-  """
   url_lte: String
-  """
-  All values greater than the given value.
-  """
   url_gt: String
-  """
-  All values greater than or equal the given value.
-  """
   url_gte: String
-  """
-  All values containing the given string.
-  """
   url_contains: String
-  """
-  All values not containing the given string.
-  """
   url_not_contains: String
-  """
-  All values starting with the given string.
-  """
   url_starts_with: String
-  """
-  All values not starting with the given string.
-  """
   url_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
   url_ends_with: String
-  """
-  All values not ending with the given string.
-  """
   url_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  postedBy: UserWhereInput
 }
 
 input LinkWhereUniqueInput {
   id: ID
 }
 
-"""
-The `Long` scalar type represents non-fractional signed whole numeric values.
-Long can represent values between -(2^63) and 2^63 - 1.
-"""
 scalar Long
 
 type Mutation {
   createLink(data: LinkCreateInput!): Link!
+  createUser(data: UserCreateInput!): User!
   updateLink(data: LinkUpdateInput!, where: LinkWhereUniqueInput!): Link
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteLink(where: LinkWhereUniqueInput!): Link
+  deleteUser(where: UserWhereUniqueInput!): User
   upsertLink(where: LinkWhereUniqueInput!, create: LinkCreateInput!, update: LinkUpdateInput!): Link!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyLinks(data: LinkUpdateInput!, where: LinkWhereInput!): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   deleteManyLinks(where: LinkWhereInput!): BatchPayload!
+  deleteManyUsers(where: UserWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -315,51 +228,192 @@ enum MutationType {
   DELETED
 }
 
-"""
-An object with an ID
-"""
 interface Node {
-  """
-  The id of the object.
-  """
   id: ID!
 }
 
-"""
-Information about pagination in a connection.
-"""
 type PageInfo {
-  """
-  When paginating forwards, are there more items?
-  """
   hasNextPage: Boolean!
-  """
-  When paginating backwards, are there more items?
-  """
   hasPreviousPage: Boolean!
-  """
-  When paginating backwards, the cursor to continue.
-  """
   startCursor: String
-  """
-  When paginating forwards, the cursor to continue.
-  """
   endCursor: String
 }
 
 type Query {
   links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link]!
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   link(where: LinkWhereUniqueInput!): Link
+  user(where: UserWhereUniqueInput!): User
   linksConnection(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LinkConnection!
-  """
-  Fetches an object given its ID
-  """
-  node("""
-  The ID of an object
-  """
-  id: ID!): Node
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  node(id: ID!): Node
 }
 
 type Subscription {
   link(where: LinkSubscriptionWhereInput): LinkSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]!
+  aggregate: AggregateUser!
+}
+
+input UserCreateInput {
+  name: String!
+  email: String!
+  password: String!
+  links: LinkCreateManyWithoutPostedByInput
+}
+
+input UserCreateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutLinksInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+enum UserOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  email_ASC
+  email_DESC
+  password_ASC
+  password_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type UserPreviousValues {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+}
+
+type UserSubscriptionPayload {
+  mutation: MutationType!
+  node: User
+  updatedFields: [String!]
+  previousValues: UserPreviousValues
+}
+
+input UserSubscriptionWhereInput {
+  AND: [UserSubscriptionWhereInput!]
+  OR: [UserSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: UserWhereInput
+}
+
+input UserUpdateInput {
+  name: String
+  email: String
+  password: String
+  links: LinkUpdateManyWithoutPostedByInput
+}
+
+input UserUpdateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutLinksDataInput
+  upsert: UserUpsertWithoutLinksInput
+}
+
+input UserUpdateWithoutLinksDataInput {
+  name: String
+  email: String
+  password: String
+}
+
+input UserUpsertWithoutLinksInput {
+  update: UserUpdateWithoutLinksDataInput!
+  create: UserCreateWithoutLinksInput!
+}
+
+input UserWhereInput {
+  AND: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  links_every: LinkWhereInput
+  links_some: LinkWhereInput
+  links_none: LinkWhereInput
+}
+
+input UserWhereUniqueInput {
+  id: ID
+  email: String
 }
